@@ -51,4 +51,4 @@ def param_solve(solver_settings, dyn_hjr, grid, times, init_values):
         values_i = hj.solve(solver_settings, dyn_hjr_alt, grid, times, init_values)
         values.append(copy.deepcopy(values_i))
         print(jnp.array(values_i).shape)
-    return jnp.min(jnp.array(values), axis=0)
+    return jnp.max(jnp.array(values), axis=0)
