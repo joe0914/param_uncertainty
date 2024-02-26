@@ -12,7 +12,7 @@ Tree = Union[T, Iterable["Tree[T]"], Mapping[Any, "Tree[T]"]]
 
 def build_target_sdf(boundary, alpha):
     def target(x):
-        distance_to_boundaries = jnp.array([x - boundary[:, 0], boundary[:, 1] - x])
+        distance_to_boundaries = jnp.array([x - boundary[:, 0], boundary[:, 1] - x, boundary[:, 1] + x, boundary[:, 0] + x])
         min_distance = jnp.min(distance_to_boundaries, axis=0) #If min_dist is negative, outside boundary
         def outside_target(_):
             max_dist_dim1 = jnp.max(jnp.array([boundary[0,0] - x, x - boundary[0,1]]), axis=0)
@@ -23,11 +23,11 @@ def build_target_sdf(boundary, alpha):
             return jnp.linalg.norm(vector)
         
         def inside_target(_):
-            return jnp.min(min_distance)
+            return -1*jnp.min(min_distance)
     
         is_outside = jnp.any(min_distance < 0)
-        target_value = lax.cond(is_outside, outside_target, inside_target, operand=None)
-        return target_value
+        sdf = lax.cond(is_outside, outside_target, inside_target, operand=None)
+        return sdf
     return target
 
 def param_solve(solver_settings, dyn_hjr, grid, times, init_values):
@@ -52,3 +52,4 @@ def param_solve(solver_settings, dyn_hjr, grid, times, init_values):
         values.append(copy.deepcopy(values_i))
         print(jnp.array(values_i).shape)
     return jnp.max(jnp.array(values), axis=0)
+
