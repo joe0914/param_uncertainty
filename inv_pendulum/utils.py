@@ -12,7 +12,7 @@ Tree = Union[T, Iterable["Tree[T]"], Mapping[Any, "Tree[T]"]]
 
 def build_target_sdf(boundary, alpha):
     def target(x):
-        distance_to_boundaries = jnp.array([x - boundary[:, 0], boundary[:, 1] - x, boundary[:, 1] + x, boundary[:, 0] + x])
+        distance_to_boundaries = jnp.array([x - boundary[0, 0], boundary[0, 1] - x, boundary[1, 1] - x, boundary[1, 0] - x])
         min_distance = jnp.min(distance_to_boundaries, axis=0) #If min_dist is negative, outside boundary
         def outside_target(_):
             max_dist_dim1 = jnp.max(jnp.array([boundary[0,0] - x, x - boundary[0,1]]), axis=0)
